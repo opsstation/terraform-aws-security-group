@@ -66,7 +66,7 @@ module "security_group" {
     from_port                = 22
     to_port                  = 22
     protocol                 = "tcp"
-    source_security_group_id = "sg-0f251332b1474ba77"
+    source_security_group_id = "sg-081d173eb9ed1cb83"
     description              = "Allow ssh traffic."
     },
     {
@@ -74,7 +74,7 @@ module "security_group" {
       from_port                = 27017
       to_port                  = 27017
       protocol                 = "tcp"
-      source_security_group_id = "sg-0f251332b1474ba77"
+      source_security_group_id = "sg-081d173eb9ed1cb83"
       description              = "Allow Mongodb traffic."
   }]
 
@@ -117,7 +117,7 @@ module "security_group" {
     from_port                = 22
     to_port                  = 22
     protocol                 = "tcp"
-    source_security_group_id = "sg-0f251332b1474ba77"
+    source_security_group_id = "sg-081d173eb9ed1cb83"
     description              = "Allow ssh outbound traffic."
     },
     {
@@ -125,7 +125,8 @@ module "security_group" {
       from_port                = 27017
       to_port                  = 27017
       protocol                 = "tcp"
-      source_security_group_id = "sg-0f251332b1474ba77"
+      source_security_group_id = "sg-081d173eb9ed1cb83"
       description              = "Allow Mongodb traffic."
   }]
 }
+
