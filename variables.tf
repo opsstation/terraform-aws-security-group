@@ -71,18 +71,21 @@ variable "new_sg_ingress_rules_with_cidr_blocks" {
   description = "Ingress rules with only cidr blocks. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_ingress_rules_with_self" {
   type        = any
   default     = {}
   description = "Ingress rules with only self. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_ingress_rules_with_source_sg_id" {
   type        = any
   default     = {}
   description = "Ingress rules with only source security group id. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_ingress_rules_with_prefix_list" {
   type        = any
   default     = {}
@@ -95,18 +98,21 @@ variable "existing_sg_ingress_rules_with_cidr_blocks" {
   description = "Ingress rules with only cidr blocks. Should be used when there is existing security group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_ingress_rules_with_self" {
   type        = any
   default     = {}
   description = "Ingress rules with only source security group id. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_ingress_rules_with_source_sg_id" {
   type        = any
   default     = {}
   description = "Ingress rules with only prefix list ids. Should be used when there is existing security group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_ingress_rules_with_prefix_list" {
   type        = any
   default     = {}
@@ -119,18 +125,21 @@ variable "new_sg_egress_rules_with_cidr_blocks" {
   description = "Egress rules with only cidr_blockd. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_egress_rules_with_self" {
   type        = any
   default     = {}
   description = "Egress rules with only self. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_egress_rules_with_source_sg_id" {
   type        = any
   default     = {}
   description = "Egress rules with only source security group id. Should be used when new security group is been deployed."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "new_sg_egress_rules_with_prefix_list" {
   type        = any
   default     = {}
@@ -143,18 +152,21 @@ variable "existing_sg_egress_rules_with_cidr_blocks" {
   description = "Ingress rules with only cidr block. Should be used when there is existing security group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_egress_rules_with_self" {
   type        = any
   default     = {}
   description = "Egress rules with only self. Should be used when there is existing security group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_egress_rules_with_source_sg_id" {
   type        = any
   default     = {}
   description = "Egress rules with only source security group id. Should be used when there is existing security group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "existing_sg_egress_rules_with_prefix_list" {
   type        = any
   default     = {}
@@ -170,7 +182,7 @@ variable "new_sg" {
 variable "sg_description" {
   type        = string
   default     = null
-  description = "Security group description. Defaults to Managed by Terraform. Cannot be empty string. NOTE: This field maps to the AWS GroupDescription attribute, for which there is no Update API. If you'd like to classify your security groups in a way that can be updated, use tags."
+  description = "Security group description. Defaults to Managed by Terraform."
 }
 
 variable "enable" {
