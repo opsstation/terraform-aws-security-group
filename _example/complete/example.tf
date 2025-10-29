@@ -18,6 +18,34 @@ module "vpc" {
 }
 
 ##-----------------------------------------------------------------------------
+## Application Security Group
+##-----------------------------------------------------------------------------
+resource "aws_security_group" "app_sg" {
+  name        = "app-sg"
+  description = "App security group used for source SG rules"
+  vpc_id      = module.vpc.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "app-sg"
+  }
+}
+
+
+##-----------------------------------------------------------------------------
 ## Security Group Module Call.
 ##-----------------------------------------------------------------------------
 module "security_group" {
@@ -66,7 +94,7 @@ module "security_group" {
     from_port                = 22
     to_port                  = 22
     protocol                 = "tcp"
-    source_security_group_id = "sg-081d173eb9ed1cb83"
+    source_security_group_id = aws_security_group.app_sg.id
     description              = "Allow ssh traffic."
     },
     {
@@ -74,7 +102,7 @@ module "security_group" {
       from_port                = 27017
       to_port                  = 27017
       protocol                 = "tcp"
-      source_security_group_id = "sg-081d173eb9ed1cb83"
+      source_security_group_id = aws_security_group.app_sg.id
       description              = "Allow Mongodb traffic."
   }]
 
@@ -117,7 +145,7 @@ module "security_group" {
     from_port                = 22
     to_port                  = 22
     protocol                 = "tcp"
-    source_security_group_id = "sg-081d173eb9ed1cb83"
+    source_security_group_id = aws_security_group.app_sg.id
     description              = "Allow ssh outbound traffic."
     },
     {
@@ -125,7 +153,7 @@ module "security_group" {
       from_port                = 27017
       to_port                  = 27017
       protocol                 = "tcp"
-      source_security_group_id = "sg-081d173eb9ed1cb83"
+      source_security_group_id = aws_security_group.app_sg.id
       description              = "Allow Mongodb traffic."
   }]
 }
