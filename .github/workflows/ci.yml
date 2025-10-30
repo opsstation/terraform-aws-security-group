@@ -19,7 +19,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.13.3
+          terraform_version: 1.13.4
 
       # Validate formatting
       - name: Terraform Format Check
