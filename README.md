@@ -1,349 +1,127 @@
-# Terraform-aws-security-group
+# 🏗️ terraform-aws-security-group
 
-# AWS Infrastructure Provisioning with Terraform
+[![OpsStation](https://img.shields.io/badge/Made%20by-OpsStation-blue?style=flat-square&logo=terraform)](https://www.opsstation.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Terraform](https://img.shields.io/badge/Terraform-1.13%2B-purple.svg?logo=terraform)](#)
+[![CI](https://github.com/OpsStation/terraform-multicloud-labels/actions/workflows/ci.yml/badge.svg)](https://github.com/OpsStation/terraform-multicloud-labels/actions/workflows/ci.yml)
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Usage](#usage)
-- [Module Inputs](#module-inputs)
-- [Module Outputs](#module-outputs)
-- [License](#license)
+> 🌩️ **A production-grade, reusable AWS Subnet module by [OpsStation](https://www.opsstation.com)**
+> Designed for reliability, performance, and security — following AWS networking best practices.
+---
 
-## Introduction
-This module is designed to create an AWS Virtual Private Cloud (VPC) and associated security groups using Terraform. It allows you to easily define and provision a VPC and its associated security groups with specific ingress and egress rules.
+## 🏢 About OpsStation
 
-## Usage
-To use this module, you can include it in your Terraform configuration. Here's an example of how to use it:
+**OpsStation** delivers **Cloud & DevOps excellence** for modern teams:
+- 🚀 **Infrastructure Automation** with Terraform, Ansible & Kubernetes
+- 💰 **Cost Optimization** via scaling & right-sizing
+- 🛡️ **Security & Compliance** baked into CI/CD pipelines
+- ⚙️ **Fully Managed Operations** across AWS, Azure, and GCP
 
-## Examples
+> 💡 Need enterprise-grade DevOps automation?
+> 👉 Visit [**www.opsstation.com**](https://www.opsstation.com) or email **hello@opsstation.com**
 
-## Example: Basic
+---
 
-```hcl
+🌟 Features
+
+- Creates and manages AWS Security Groups
+- Supports new and existing Security Groups
+- Flexible ingress and egress rule management
+- Allows rules with CIDR blocks, prefix lists, and security group references
+- Supports both IPv4 and IPv6 traffic rules
+- Enables fine-grained control for TCP, UDP, and ICMP protocols
+- Compatible with VPC and cross-VPC setups
+- Automatically tags resources using the Labels module
+- Fully compatible with other OpsStation Terraform modules
+
+
+## ⚙️ Usage Example
+
 module "security_group" {
-  source      = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
-  name        = local.name
-  environment = local.environment
-  vpc_id      = module.vpc.vpc_id
+source      = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
+name        = "app"
+environment = "test"
+vpc_id      = "vpc-0a1b2c3d4e5f6g7h8"
 
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["172.16.0.0/16"]
-    description = "Allow ssh traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["172.16.0.0/16"]
-    description = "Allow ssh outbound traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb outbound traffic."
-    }
-  ]
+ingress_rules = [
+{
+description = "Allow HTTP traffic"
+from_port   = 80
+to_port     = 80
+protocol    = "tcp"
+cidr_blocks = ["0.0.0.0/0"]
+},
+{
+description = "Allow HTTPS traffic"
+from_port   = 443
+to_port     = 443
+protocol    = "tcp"
+cidr_blocks = ["0.0.0.0/0"]
 }
-```
+]
 
-## Example: Complete
-```hcl
+egress_rules = [
+{
+description = "Allow all outbound traffic"
+from_port   = 0
+to_port     = 0
+protocol    = "-1"
+cidr_blocks = ["0.0.0.0/0"]
+}
+]
+
 module "security_group" {
-  source      = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
-  name        = local.name
-  environment = local.environment
-  vpc_id      = module.vpc.vpc_id
+source      = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
+name        = "db"
+environment = "prod"
+vpc_id      = "vpc-0a1b2c3d4e5f6g7h8"
 
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["172.16.0.0/16"]
-    description = "Allow ssh traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  new_sg_ingress_rules_with_self = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      description = "Allow Mongodbn traffic."
-    }
-  ]
-
-  new_sg_ingress_rules_with_source_sg_id = [{
-    rule_count               = 1
-    from_port                = 22
-    to_port                  = 22
-    protocol                 = "tcp"
-    source_security_group_id = "sg-0f251332b1474ba77"
-    description              = "Allow ssh traffic."
-  },
-    {
-      rule_count               = 2
-      from_port                = 27017
-      to_port                  = 27017
-      protocol                 = "tcp"
-      source_security_group_id = "sg-0f251332b1474ba77"
-      description              = "Allow Mongodb traffic."
-    }]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
-    description = "Allow ssh outbound traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb outbound traffic."
-    }
-  ]
-
-  new_sg_egress_rules_with_self = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh outbound traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      description = "Allow Mongodb traffic."
-    }]
-
-  new_sg_egress_rules_with_source_sg_id = [{
-    rule_count               = 1
-    from_port                = 22
-    to_port                  = 22
-    protocol                 = "tcp"
-    source_security_group_id = "sg-0f251332b1474ba77"
-    description              = "Allow ssh outbound traffic."
-  },
-    {
-      rule_count               = 2
-      from_port                = 27017
-      to_port                  = 27017
-      protocol                 = "tcp"
-      source_security_group_id = "sg-0f251332b1474ba77"
-      description              = "Allow Mongodb traffic."
-    }]
+ingress_rules = [
+{
+description     = "Allow MySQL from self SG"
+from_port       = 3306
+to_port         = 3306
+protocol        = "tcp"
+self            = true
 }
-```
+]
 
-## Example: Only_rules
-
-```hcl
-module "security_group_rules" {
-  source         = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
-  name           = local.name
-  environment    = local.environment
-  vpc_id         = module.vpc.vpc_id
-  new_sg         = false
-  existing_sg_id = "sg-0474592052307dbb2"
-
-  ## INGRESS Rules
-  existing_sg_ingress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["10.9.0.0/16"]
-    description = "Allow ssh traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["10.9.0.0/16"]
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  ## EGRESS Rules
-  existing_sg_egress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["10.9.0.0/16"]
-    description = "Allow ssh outbound traffic."
-  },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["10.9.0.0/16"]
-      description = "Allow Mongodb outbound traffic."
-    }]
-}
-```
-
-## Example: Prefix_list
-
-```hcl
 module "security_group" {
-  source              = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
-  name                = local.name
-  environment         = local.environment
-  vpc_id              = module.vpc.vpc_id
-  prefix_list_enabled = true
-  entry = [{
-    cidr = "10.19.0.0/16"
-  }]
+source      = "git::https://github.com/opsstation/terraform-aws-security-group.git?ref=v1.0.0"
+name        = "backend"
+environment = "staging"
+vpc_id      = "vpc-0a1b2c3d4e5f6g7h8"
 
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_prefix_list = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh traffic."
-  }
-  ]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_prefix_list = [{
-    rule_count  = 1
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    description = "Allow mysql/aurora outbound traffic."
-  }
-  ]
+ingress_rules = [
+{
+description     = "Allow API access from ALB SG"
+from_port       = 8080
+to_port         = 8080
+protocol        = "tcp"
+security_groups = ["sg-0ab12cd34ef56gh78"]
 }
-```
+]
 
-## Examples
-For detailed examples on how to use this module, please refer to the [Examples](https://github.com/opsstation/terraform-aws-security-group/tree/master/example) directory within this repository.
+### 🔐 Outputs (AWS KMS Module)
 
-## Author
-Your Name Replace '[License Name]' and '[Your Name]' with the appropriate license and your information. Feel free to expand this README with additional details or usage instructions as needed for your specific use case.
+| Name                  | Description                                                                 |
+|-----------------------|-----------------------------------------------------------------------------|
+| security_group_id	    | The ID of the created or referenced Security Group.                         |
+| security_group_arn	   | The ARN of the Security Group.                                           |
+| security_group_name	  | The name of the Security Group.                                           |
+| ingress_rule_ids	     | List of all created ingress rule IDs.                                      |
+| egress_rule_ids	      | List of all created egress rule IDs.                                      |
+| vpc_id	               | The VPC ID where the Security Group resides.                             |
+| managedby	            | Tag identifying the managing entity (e.g., OpsStation).                     |
+| tags	                 | Key-value pairs of all resource tags applied.                               |
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/opsstation/terraform-aws-security-group/blob/master/LICENSE) file for details.
-<!-- BEGIN_TF_DOCS -->
-## Requirements
+### ☁️ Tag Normalization Rules (AWS)
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.4 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.1.0 |
+| Cloud | Case      | Allowed Characters | Example                            |
+|--------|-----------|------------------|------------------------------------|
+| **AWS** | TitleCase | Any              | `Name`, `Environment`, `CostCenter` |
 
-## Providers
+---
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.1.0 |
-
-## Modules
-
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_labels"></a> [labels](#module\_labels) | opsstation/labels/multicloud | 1.0.0 |
-
-## Resources
-
-| Name | Type |
-|------|------|
-| [aws_ec2_managed_prefix_list.prefix_list](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_managed_prefix_list) | resource |
-| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group_rule.egress_cidr_blocks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.ingress_cidr_blocks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group.existing](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/security_group) | data source |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_enable"></a> [enable](#input\_enable) | Flag to control module creation. | `bool` | `true` | no |
-| <a name="input_entry"></a> [entry](#input\_entry) | Can be specified multiple times for each prefix list entry. | `list(any)` | `[]` | no |
-| <a name="input_environment"></a> [environment](#input\_environment) | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
-| <a name="input_existing_sg_egress_rules_with_cidr_blocks"></a> [existing\_sg\_egress\_rules\_with\_cidr\_blocks](#input\_existing\_sg\_egress\_rules\_with\_cidr\_blocks) | Ingress rules with only cidr block. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_existing_sg_egress_rules_with_prefix_list"></a> [existing\_sg\_egress\_rules\_with\_prefix\_list](#input\_existing\_sg\_egress\_rules\_with\_prefix\_list) | Egress rules with only prefic ist ids. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_existing_sg_egress_rules_with_self"></a> [existing\_sg\_egress\_rules\_with\_self](#input\_existing\_sg\_egress\_rules\_with\_self) | Egress rules with only self. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_existing_sg_egress_rules_with_source_sg_id"></a> [existing\_sg\_egress\_rules\_with\_source\_sg\_id](#input\_existing\_sg\_egress\_rules\_with\_source\_sg\_id) | Egress rules with only source security group id. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_existing_sg_id"></a> [existing\_sg\_id](#input\_existing\_sg\_id) | Provide existing security group id for updating existing rule | `string` | `null` | no |
-| <a name="input_existing_sg_ingress_rules_with_cidr_blocks"></a> [existing\_sg\_ingress\_rules\_with\_cidr\_blocks](#input\_existing\_sg\_ingress\_rules\_with\_cidr\_blocks) | Ingress rules with only cidr blocks. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_existing_sg_ingress_rules_with_prefix_list"></a> [existing\_sg\_ingress\_rules\_with\_prefix\_list](#input\_existing\_sg\_ingress\_rules\_with\_prefix\_list) | Ingress rules with only prefix\_list. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_existing_sg_ingress_rules_with_self"></a> [existing\_sg\_ingress\_rules\_with\_self](#input\_existing\_sg\_ingress\_rules\_with\_self) | Ingress rules with only source security group id. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_existing_sg_ingress_rules_with_source_sg_id"></a> [existing\_sg\_ingress\_rules\_with\_source\_sg\_id](#input\_existing\_sg\_ingress\_rules\_with\_source\_sg\_id) | Ingress rules with only prefix list ids. Should be used when there is existing security group. | `any` | `{}` | no |
-| <a name="input_label_order"></a> [label\_order](#input\_label\_order) | Label order, e.g. `name`,`application`. | `list(any)` | <pre>[<br>  "name",<br>  "environment"<br>]</pre> | no |
-| <a name="input_managedby"></a> [managedby](#input\_managedby) | ManagedBy, eg 'cypik'. | `string` | `"opsstation"` | no |
-| <a name="input_max_entries"></a> [max\_entries](#input\_max\_entries) | The maximum number of entries that this prefix list can contain. | `number` | `5` | no |
-| <a name="input_name"></a> [name](#input\_name) | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
-| <a name="input_new_sg"></a> [new\_sg](#input\_new\_sg) | Flag to control creation of new security group. | `bool` | `true` | no |
-| <a name="input_new_sg_egress_rules_with_cidr_blocks"></a> [new\_sg\_egress\_rules\_with\_cidr\_blocks](#input\_new\_sg\_egress\_rules\_with\_cidr\_blocks) | Egress rules with only cidr\_blockd. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_egress_rules_with_prefix_list"></a> [new\_sg\_egress\_rules\_with\_prefix\_list](#input\_new\_sg\_egress\_rules\_with\_prefix\_list) | Egress rules with only prefix list ids. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_egress_rules_with_self"></a> [new\_sg\_egress\_rules\_with\_self](#input\_new\_sg\_egress\_rules\_with\_self) | Egress rules with only self. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_egress_rules_with_source_sg_id"></a> [new\_sg\_egress\_rules\_with\_source\_sg\_id](#input\_new\_sg\_egress\_rules\_with\_source\_sg\_id) | Egress rules with only source security group id. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_ingress_rules_with_cidr_blocks"></a> [new\_sg\_ingress\_rules\_with\_cidr\_blocks](#input\_new\_sg\_ingress\_rules\_with\_cidr\_blocks) | Ingress rules with only cidr blocks. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_ingress_rules_with_prefix_list"></a> [new\_sg\_ingress\_rules\_with\_prefix\_list](#input\_new\_sg\_ingress\_rules\_with\_prefix\_list) | Ingress rules with only prefix list ids. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_ingress_rules_with_self"></a> [new\_sg\_ingress\_rules\_with\_self](#input\_new\_sg\_ingress\_rules\_with\_self) | Ingress rules with only self. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_new_sg_ingress_rules_with_source_sg_id"></a> [new\_sg\_ingress\_rules\_with\_source\_sg\_id](#input\_new\_sg\_ingress\_rules\_with\_source\_sg\_id) | Ingress rules with only source security group id. Should be used when new security group is been deployed. | `any` | `{}` | no |
-| <a name="input_prefix_list_address_family"></a> [prefix\_list\_address\_family](#input\_prefix\_list\_address\_family) | (Required, Forces new resource) The address family (IPv4 or IPv6) of prefix list. | `string` | `"IPv4"` | no |
-| <a name="input_prefix_list_enabled"></a> [prefix\_list\_enabled](#input\_prefix\_list\_enabled) | Enable prefix\_list. | `bool` | `false` | no |
-| <a name="input_prefix_list_ids"></a> [prefix\_list\_ids](#input\_prefix\_list\_ids) | The ID of the prefix list. | `list(string)` | `[]` | no |
-| <a name="input_repository"></a> [repository](#input\_repository) | Terraform current module repo | `string` | `"https://github.com/opsstation/terraform-aws-security_group"` | no |
-| <a name="input_sg_description"></a> [sg\_description](#input\_sg\_description) | Security group description. Defaults to Managed by Terraform. | `string` | `null` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC that the instance security group belongs to. | `string` | `""` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| <a name="output_prefix_list_id"></a> [prefix\_list\_id](#output\_prefix\_list\_id) | The ID of the prefix list. |
-| <a name="output_security_group_arn"></a> [security\_group\_arn](#output\_security\_group\_arn) | IDs on the AWS Security Groups associated with the instance. |
-| <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | IDs on the AWS Security Groups associated with the instance. |
-| <a name="output_security_group_tags"></a> [security\_group\_tags](#output\_security\_group\_tags) | A mapping of public tags to assign to the resource. |
-<!-- END_TF_DOCS -->
+### 💙 Maintained by [OpsStation](https://www.opsstation.com)
+> OpsStation — Simplifying Cloud, Securing Scale.
